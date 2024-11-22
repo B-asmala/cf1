@@ -51,7 +51,7 @@ async function showRace(){
         
         
     } catch (error) {
-        console.log(error);
+        alert("problem with internet or codeforces is currently down");
         
     }
 
@@ -108,7 +108,7 @@ async function countDays(handle){
         
         
     } catch (error) {
-        console.log(error);
+        throw error;
         
     }
 
