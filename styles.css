@@ -90,7 +90,8 @@ h1
     width: fit-content;
     margin: auto;
     margin-bottom: 15px;
-    font-size: 22pt;
+    white-space: nowrap;
+    overflow-x: auto;
     
     color: rgb(255, 0, 0);
 }
