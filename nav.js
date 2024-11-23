@@ -1,5 +1,3 @@
-
-
 // Get the navbar
 const navbar = document.getElementById('navbar');
 

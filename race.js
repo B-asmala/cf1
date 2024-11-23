@@ -1,27 +1,31 @@
 //const api = "https://codeforces.com/api/user.status?handle=";
 const button = document.getElementById("go-button");
 const table = document.getElementById("track-table");
-const subsCount = 50;
-const tilesCount = 20;
-let streaks = {};
-let heatmaps = {};
+const subsCount = 50;//submissions per api request
+const tilesCount = 20;//tiles drawn = days of heatmap
+let streaks = {};//store the scores of each player
+let heatmaps = {};//heatmaps of each player
 
 
 async function showRace(){
     const handles = getHandles(); //get array of handles entered
     try {
         if(!handles.length){
-            alert("please enter handles first!")
+            //no handles entered
+            alert("please enter handles first!");
         }else{
+            //remove previous data
             table.innerHTML = "";
+            streaks = {};
+            heatmaps = {};
 
+            //disable button
             button.disabled = true;
             button.style.backgroundColor = "gray"; 
             button.innerText = "---";
 
-            streaks = {};
-            heatmaps = {};
             
+            //construct heatmaps of players 
             let promises = handles.map(async (handle) => {
                 await countDays(handle);
             });
@@ -33,9 +37,11 @@ async function showRace(){
             streaks = Object.entries(streaks);
             streaks.sort((a, b) => b[1] - a[1]);
             console.log(streaks);
+
             //players dictionary has the info now
             buildTrack();
 
+            //enable the button
             button.disabled = false;
             button.style.backgroundColor = "red";
             button.innerText = "Go!";
@@ -66,18 +72,20 @@ async function showRace(){
 
 async function countDays(handle){
     try {
+        //initialize
         heatmaps[handle] = new Array(tilesCount).fill(0);
         streaks[handle] = 0;
             
         
-        let f = 1;
-        let page = 0;
+        let f = 1;//to know when to stop requesting more submissions
+        let page = 0;//for api requests
         let today = Math.floor(Date.now()/(1000 * 60 * 60 * 24));
         let di = today + 1;
         let d = 0;
-        while(f || (today - d < tilesCount)) {
+        while(f || (today - d < tilesCount)) { // stop after all tiles are colored and we have the whole streak of player
             let data = await getData(handle, (page * subsCount) + 1);
-            if(data.result.length == 0)break;
+            if(data.result.length == 0)break; //no more submissions
+            page ++;
 
             for(let i = 0; i < subsCount && i < data.result.length; i ++){
                 d = Math.floor(data.result[i].creationTimeSeconds/(60 * 60 * 24));
@@ -91,6 +99,7 @@ async function countDays(handle){
                     streaks[handle] ++;
                     di = d;
                 }else{
+                    //streak broken :(
                     f= 0;
                 }
                  
@@ -98,12 +107,10 @@ async function countDays(handle){
             
             
             
-            page ++;
+            
 
         }
         
-        // console.log(streaks[handle]);
-        // console.log(heatmaps[handle]);
 
         
         
@@ -114,6 +121,8 @@ async function countDays(handle){
 
 }
 
+
+//fetching data
 async function getData(handle, page){
     try {
         const response = await fetch(`https://codeforces.com/api/user.status?handle=${handle}&from=${page}&count=${subsCount}`);
@@ -196,8 +205,9 @@ function buildTrack(){
 function getHandles(){
     const input = document.getElementById("handles-input");
     let inputArr = input.value;
-    inputArr = inputArr.replace(/\s+/g, '').split(',').filter(i => i !== "");
+    inputArr = inputArr.replace(/\s+/g, '').split(',').filter(i => i !== "");//remove white space, split handles, remove empty strings
     let handles = [];
+    //to ensure there are no duplicates
     inputArr.forEach(handle => {
         if(!handles.includes(handle)){
             handles.push(handle);
