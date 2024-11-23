@@ -5,6 +5,7 @@ CF1 is a tool for visualizing streaks of players - competitive programmers - on 
 <br>
 [give it a try!](https://b-asmala.github.io/cf1/)
 <br>
+<br>
 and remember to dirve safely 🏎️
 <br>
 ![finish line](images/finish-line.png)
